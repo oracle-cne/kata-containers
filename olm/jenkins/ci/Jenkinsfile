@@ -1,0 +1,10 @@
+@Library('olcne-pipeline') _
+import com.oracle.olcne.pipeline.BranchPattern
+
+olcnePipeline(
+        branchPattern: new BranchPattern(master: "oracle/release/{{{ .major }}}.{{{ .minor }}}.{{{ .patch }}}", feature: "feature/.*"),
+        customStages: [container: [enabled: false], merge: [enabled: true]],
+        platforms: ['ol7', 'ol8'],
+        yumOL7Repos: ['ol7_developer_golang115', 'ol7_developer_EPEL'],
+        yumOL8Repos: ['ol8_appstream', 'ol8_codeready_builder']
+)

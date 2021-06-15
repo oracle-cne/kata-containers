@@ -1,0 +1,7 @@
+---
+TagFormat: "(?P<major>2).(?P<minor>[[:digit:]]+).(?P<patch>[[:digit:]]+)"
+Comparator: 0
+BranchTemplate: "feature/${major}.${minor}.${patch}"
+MasterBranchTemplate: "oracle/release/${major}.${minor}.${patch}"
+TemplateDirectory: "v${major}.${minor}"
+SemverTagFilter: "> 2.0.0"
