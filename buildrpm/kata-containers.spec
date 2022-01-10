@@ -54,6 +54,8 @@
 %global agent_make_vars         LIBC=gnu \\\
                                 DESTDIR=%{buildroot}%{kataagentdir}
 
+%global _buildhost build-ol%{?oraclelinux}-%{?_arch}.oracle.com
+
 
 Name:	      %{repo}
 Version:      {{{$version}}}
