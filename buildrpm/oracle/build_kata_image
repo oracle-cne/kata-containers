@@ -1,0 +1,51 @@
+o "Running: build_kata_image as $(whoami)"
+# Script responsible for oclc-image
+export DISTRO=ol${1}
+
+function cleanup {
+ rm /dev/loop0
+ rm /dev/loop1
+ rm /dev/loop2
+ rm /dev/loop3
+}
+
+set -x
+
+hered=$(cd $(dirname $0) && pwd )
+
+# Make some loopback devices if none are present
+ls /dev/loop[0-9] 1>/dev/null 2>/dev/null
+if [ $? -ne 0 ]; then
+ mknod /dev/loop0 -m0660 b 7 0
+ mknod /dev/loop1 -m0660 b 7 8
+ mknod /dev/loop2 -m0660 b 7 16
+ mknod /dev/loop3 -m0660 b 7 24
+ trap cleanup EXIT
+fi
+
+# There is no agent running in the build container that is capable of making
+# device files on behalf of parted.  It is necessary to hijack the partprobe
+# binary so they can be made manually.
+chmod 755 ./partprobe
+cp ./partprobe `which partprobe`
+
+# Build the image artifacts ....
+# To support OL8 builds, we need to identify the platform of the build environment
+ROOTFS_DIR=`pwd`/${DISTRO}_rootfs
+
+export AGENT_SOURCE_BIN=../../src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent
+
+# ==== First the initrd
+export AGENT_INIT=yes
+make initrd DISTRO=ol${1}
+ls -l kata-containers-initrd.img || exit 1
+
+# ==== Then normal image
+# BEWARE: in case the systemd is part of initrd (AGENT_INIT=no) the initrd-builder cripples /sbin/init... better to remove and start over
+rm -rf "$ROOTFS_DIR"
+rm -f .*.done  # markers created by Makefile
+
+export AGENT_INIT=no
+make image DISTRO=ol${1}
+
+ls -l kata-containers.img || exit 1
