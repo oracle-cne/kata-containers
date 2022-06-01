@@ -1,0 +1,73 @@
+commit c033c0fe1f485fe65371020e639379a1509cca8e
+Author: michthom <michael.a.thompson@oracle.com>
+Date:   Wed May 11 15:31:16 2022 +0100
+
+    Add patches for build failure
+    
+     - Resolves kata-agent compilation failures, e.g.
+    
+            Compiling kata-agent v0.1.0 (/home/vagrant/rpmbuild/BUILD/kata-containers-2.1.1/src/agent)
+            error: field is never read: `ifaces`
+              --> src/network.rs:20:5
+               |
+            20 |     ifaces: HashMap<String, Interface>,
+               |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               |
+               = note: `-D dead-code` implied by `-D warnings`
+            note: `Network` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+              --> src/network.rs:18:10
+               |
+            18 | #[derive(Debug, Default)]
+               |          ^^^^^
+               = note: this error originates in the derive macro `Debug` (in Nightly builds, run with -Z macro-backtrace for more info)error: field is never read: `routes`
+              --> src/network.rs:21:5
+               |
+            21 |     routes: Vec<Route>,
+               |     ^^^^^^^^^^^^^^^^^^
+               |
+            note: `Network` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+              --> src/network.rs:18:10
+               |
+            18 | #[derive(Debug, Default)]
+               |          ^^^^^
+               = note: this error originates in the derive macro `Debug` (in Nightly builds, run with -Z macro-backtrace for more info)error: could not compile `kata-agent` due to 2 previous errors
+            make: *** [target/x86_64-unknown-linux-gnu/release/kata-agent] Error 101
+            error: Bad exit status from /var/tmp/rpm-tmp.GalblM (%build)
+    
+     - Resolves erroroneous appending of '-dirty' to commit in kata-runtime command execution.
+    
+     - Add missing logic in specfile.
+
+commit 8155ee1d7c43c6061734058afd6f94bb1dcf5ddc
+Author: Durai Govindasamy <durai.vattakalvalasu.govindas@oracle.com>
+Date:   Mon Jan 10 22:39:28 2022 +0000
+
+    Disabled MR creation.
+
+commit e310d14887edd4ae3532f91dd8ee25afa82c897f
+Merge: 5b084a0 9a8608c
+Author: Durai Govindasamy <durai.vattakalvalasu.govindas@oracle.com>
+Date:   Mon Jan 10 22:25:16 2022 +0000
+
+    Merge branch 'feature/olcne-3280' into 'oracle-template'
+    
+    Added logic in pipeline for Build Host metadata in the RPMs
+    
+    See merge request OLCNE/kata/kata-containers!25
+    
+    
+    Reviewed By: Durai Govindasamy <durai.vattakalvalasu.govindas@oracle.com>
+
+commit 9a8608c8b2b1446f7bb4b92747c2974e11c8064e
+Author: michthom <michael.a.thompson@oracle.com>
+Date:   Tue Nov 9 09:05:30 2021 +0000
+
+    Added logic in pipeline for Build Host metadata in the RPMs
+
+commit 5b084a0ba4757c56f9f4083b1911eaef558c7f5a
+Author: Thomas Tanaka <thomas.tanaka@oracle.com>
+Date:   Tue Jun 15 11:23:10 2021 -0700
+
+    Add oracle-template
+    
+    Signed-off-by: Thomas Tanaka <thomas.tanaka@oracle.com>

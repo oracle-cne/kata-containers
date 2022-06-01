@@ -1,0 +1,13 @@
+diff --git src/runtime/Makefile src/runtime/Makefile
+index 4a69c05..7a66054 100644
+--- src/runtime/Makefile
++++ src/runtime/Makefile
+@@ -516,7 +516,7 @@ all: runtime containerd-shim-v2 netmon monitor
+ 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
+ .git-commit.tmp:
+ 	@echo -n "$$(git rev-parse HEAD 2>/dev/null)" >$@
+-	@test -n "$$(git status --porcelain --untracked-files=no)" && echo -n "-dirty" >>$@ || true
++	@test -n "$$(git status --porcelain --untracked-files=no)" && echo -n "-dirty" || true >>$@
+ 
+ containerd-shim-v2: $(SHIMV2_OUTPUT)
+ 
