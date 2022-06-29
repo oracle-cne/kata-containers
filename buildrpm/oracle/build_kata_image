@@ -1,4 +1,4 @@
-o "Running: build_kata_image as $(whoami)"
+echo "Running: build_kata_image as $(whoami)"
 # Script responsible for oclc-image
 export DISTRO=ol${1}
 

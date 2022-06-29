@@ -27,16 +27,9 @@
 %global machinetype "q35"
 %endif
 
-#%global katadatadir             %{_datadir}/kata-containers
-#%global katadefaults            %{katadatadir}/defaults
 %global katadatadir             %{_datadir}/defaults
 %global katadefaults            %{katadatadir}/kata-containers
 %global katacache               %{_localstatedir}/cache
-%global katalibexecdir          %{_libexecdir}/kata-containers
-%global katalocalstatecachedir  %{katacache}/kata-containers
-
-%global kataagentdir            %{katalibexecdir}/agent
-%global kataosbuilderdir        %{katalibexecdir}/osbuilder
 
 %global runtime_make_vars       QEMUPATH=%{qemupath} \\\
                                 KERNELTYPE="compressed" \\\
@@ -53,7 +46,7 @@
                                 FEATURE_SELINUX="yes"
 
 %global agent_make_vars         LIBC=gnu \\\
-                                DESTDIR=%{buildroot}%{kataagentdir}
+                                DESTDIR=%{buildroot}
 
 %global _buildhost build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 
@@ -69,8 +62,14 @@ Source0:      %{name}-%{version}.tar.bz2
 Patch0:       network.rs.patch
 Patch1:       mount.rs.patch
 Patch2:	      Makefile.patch
+Patch3:       image_builder.sh.patch
 
+{{{- if semverCompare "<2.4" $version }}}
 BuildRequires: golang >= 1.15.10
+{{{- else }}}
+BuildRequires: golang >= 1.16.9
+{{{- end }}}
+
 BuildRequires: qemu-img
 BuildRequires: parted
 BuildRequires: e2fsprogs
@@ -114,6 +113,7 @@ workload isolation and security advantages of VMs. https://katacontainers.io/.}
 %patch0
 %patch1
 %patch2
+%patch3
 
 %build
 export GOPATH=$(go env GOPATH)
@@ -199,8 +199,9 @@ popd
 %{_datadir}/bash-completion/completions/kata-runtime
 
 #agent
-%dir %{kataagentdir}
-%{kataagentdir}/*
+/usr/bin/kata-agent
+/usr/lib/systemd/system//kata-agent.service
+/usr/lib/systemd/system//kata-containers.target
 
 %post
 # we need to make some baseline adjustments to the crio config post installation
@@ -221,9 +222,9 @@ checkCrioConf () {
 
 checkCrioConf "\[crio.runtime\]" "manage_network_ns_lifecycle" "true"
 checkCrioConf "\[crio.runtime\]" "selinux" "false"
-checkCrioConf "\[crio.image\]" "registries" "\[\"docker.io\", \"container-registry.oracle.com\"\]"
+checkCrioConf "\[crio.image\]" "registries" "\[\"docker.io\", \"container-registry.oracle.com\/olcne\"\]"
 checkCrioConf "\[crio.image\]" "pause_image_auth_file" "\"\/run\/containers\/0\/auth.json\""
-checkCrioConf "\[crio.image\]" "pause_image " "\"container-registry.oracle.com\/kubernetes\/pause:3.4\""
+checkCrioConf "\[crio.image\]" "pause_image " "\"container-registry.oracle.com\/kubernetes\/pause:3.5\""
 
 # Configure configuration-qemu.toml
 QEMU_CONF="/usr/share/defaults/kata-containers/configuration-qemu.toml"

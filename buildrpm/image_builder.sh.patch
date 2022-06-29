@@ -1,0 +1,18 @@
+diff --git tools/osbuilder/image-builder/image_builder.sh tools/osbuilder/image-builder/image_builder.sh
+index 5d01b0a2..ce1c6345 100755
+--- tools/osbuilder/image-builder/image_builder.sh
++++ tools/osbuilder/image-builder/image_builder.sh
+@@ -405,6 +405,13 @@ create_rootfs_image() {
+ 	sync
+ 	OK "rootfs copied"
+ 
++        info "Copying agent files to root partition"
++        cp /root/rpmbuild/BUILD/kata-containers-*/src/agent/kata-containers.target "${mount_dir}"/usr/lib/systemd/system/
++        cp /root/rpmbuild/BUILD/kata-containers-*/src/agent/kata-agent.service.in "${mount_dir}"/usr/lib/systemd/system/kata-agent.service
++        sed -i 's|ExecStart=.*|ExecStart=/usr/bin/kata-agent|g' "${mount_dir}"/usr/lib/systemd/system/kata-agent.service
++        sync
++        OK "agent files copied"
++
+ 	info "Removing unneeded systemd services and sockets"
+ 	for u in "${systemd_units[@]}"; do
+ 		find "${mount_dir}" -type f \( \
