@@ -115,7 +115,7 @@ workload isolation and security advantages of VMs. https://katacontainers.io/.}
 %patch2
 %patch3
 
-# For jenkins build failure:
+# For build failure:
 # note: /usr/bin/ld: cannot find -lseccomp
 libseccomp_path=$(rpm -ql libseccomp | grep .so | head -1)
 libseccomp_basepath=${libseccomp_path%/*}
