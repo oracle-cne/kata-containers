@@ -2,7 +2,7 @@ diff --git tools/osbuilder/image-builder/image_builder.sh tools/osbuilder/image-
 index 5d01b0a2..ce1c6345 100755
 --- tools/osbuilder/image-builder/image_builder.sh
 +++ tools/osbuilder/image-builder/image_builder.sh
-@@ -405,6 +405,13 @@ create_rootfs_image() {
+@@ -505,6 +505,13 @@ create_rootfs_image() {
  	sync
  	OK "rootfs copied"
  
@@ -13,6 +13,6 @@ index 5d01b0a2..ce1c6345 100755
 +        sync
 +        OK "agent files copied"
 +
- 	info "Removing unneeded systemd services and sockets"
- 	for u in "${systemd_units[@]}"; do
- 		find "${mount_dir}" -type f \( \
+	info "Setup systemd"
+	setup_systemd "${mount_dir}"
+
