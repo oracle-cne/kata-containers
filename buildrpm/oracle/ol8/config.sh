@@ -3,7 +3,7 @@ OS_VERSION=8
 
 LOG_FILE="/var/log/yum-ol8.log"
 
-BASE_URL=http://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/x86_64
+BASE_URL="http://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/\$basearch"
 
 GPG_KEY_FILE="RPM-GPG-KEY-oracle-ol8"
 
@@ -21,3 +21,9 @@ INIT_PROCESS=systemd
 ARCH_EXCLUDE_LIST=()
 
 [ "$SECCOMP" = "yes" ] && PACKAGES+=" libseccomp" || true
+[ "$SELINUX" = yes ] && PACKAGES+=" container-selinux" || true
+
+if [ "$SELINUX" == yes ]; then
+    # AppStream repository is required for the container-selinux package
+    APPSTREAM_URL="https://yum.oracle.com/repo/OracleLinux/OL8/appstream/\$basearch"
+fi

@@ -1,18 +1,13 @@
 @Library('olcne-pipeline') _
 import com.oracle.olcne.pipeline.BranchPattern
 
-{{{- if semverCompare "<1.24" $version }}}
-String golang_version = "115";
-{{{- else }}}
-String golang_version = "116";
-{{{- end }}}
-
 olcnePipeline(
     branchPattern: new BranchPattern(master: "oracle/release/{{{ .major }}}.{{{ .minor }}}.{{{ .patch }}}", feature: "feature/.*"),
     customStages: [container: [enabled: false]],
-    platforms: ['ol7', 'ol8'],
-    yumOL7Repos: ['ol7_developer_golang' + golang_version, 'ol7_developer_EPEL'],
-    yumOL8Repos: ['ol8_appstream', 'ol8_codeready_builder', 'ol8_developer'],
+    platforms: ['ol8', 'ol9'],
+    architectures: ['x86_64', 'aarch64'],
+    yumOL8Repos: ['ol8_appstream', 'ol8_codeready_builder', 'ol8_developer', 'ol8_kvm_appstream'],
     ol8ModulesToDisable: ['go-toolset:ol8'],
-    ol8ModulesToEnable: ['go-toolset:ol8addon']
+    ol8ModulesToEnable: ['go-toolset:ol8addon', 'rust-toolset'],
+    yumOL9Repos: ['ol9_appstream', 'ol9_codeready_builder', 'ol9_developer', 'ol9_kvm_utils', 'ol9_developer_EPEL']
 )

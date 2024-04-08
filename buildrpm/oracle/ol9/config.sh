@@ -1,11 +1,11 @@
 OS_NAME="OracleLinux"
-OS_VERSION=7
+OS_VERSION=9
 
-LOG_FILE="/var/log/yum-ol7.log"
+LOG_FILE="/var/log/yum-ol9.log"
 
-BASE_URL=http://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64
+BASE_URL="http://yum.oracle.com/repo/OracleLinux/OL9/baseos/latest/\$basearch"
 
-GPG_KEY_FILE="RPM-GPG-KEY-oracle-ol7"
+GPG_KEY_FILE="RPM-GPG-KEY-oracle-ol9"
 
 PACKAGES="iptables chrony"
 
@@ -21,3 +21,9 @@ INIT_PROCESS=systemd
 ARCH_EXCLUDE_LIST=()
 
 [ "$SECCOMP" = "yes" ] && PACKAGES+=" libseccomp" || true
+[ "$SELINUX" = yes ] && PACKAGES+=" container-selinux" || true
+
+if [ "$SELINUX" == yes ]; then
+    # AppStream repository is required for the container-selinux package
+    APPSTREAM_URL="https://yum.oracle.com/repo/OracleLinux/OL9/appstream/\$basearch"
+fi

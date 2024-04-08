@@ -33,7 +33,7 @@ cp ./partprobe `which partprobe`
 # To support OL8 builds, we need to identify the platform of the build environment
 ROOTFS_DIR=`pwd`/${DISTRO}_rootfs
 
-export AGENT_SOURCE_BIN=../../src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent
+export AGENT_SOURCE_BIN=../../src/agent/target/$(uname --hardware-platform)-unknown-linux-gnu/release/kata-agent
 
 # ==== First the initrd
 export AGENT_INIT=yes
