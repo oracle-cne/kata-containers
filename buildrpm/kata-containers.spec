@@ -204,7 +204,7 @@ popd
 #rm %{buildroot}%{_datadir}/kata-containers/defaults/configuration-*.toml
 
 %files
-%license buildrpm/oracle/EULA LICENSE
+%license buildrpm/oracle/EULA LICENSE THIRD_PARTY_LICENSES.txt olm/SECURITY.md
 %dir /usr/share/kata-containers
 /usr/share/kata-containers/kata-containers-%{version}.img
 /usr/share/kata-containers/kata-containers-initrd-%{version}.img
