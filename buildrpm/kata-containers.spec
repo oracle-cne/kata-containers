@@ -117,6 +117,7 @@ Obsoletes: kata-ksm-throttler <= %{version}
 Obsoletes: kata-proxy <= %{version}
 Obsoletes: kata-runtime <= %{version}
 Obsoletes: kata-shim <= %{version}
+Obsoletes: kata-agent <= %{version}
 
 %description
 Kata Containers version 2.x repository. Kata Containers is an open source
