@@ -93,7 +93,15 @@ Requires: qemu-kvm-core >= 7.2.0
 Requires: cri-o >= 1.23
 Requires: cri-tools >= 1.23
 
+%if %{?oraclelinux} == 8
 Requires: kernel-uek-container >= 5.15.0
+%endif
+%if %{?oraclelinux} == 9
+%ifnarch aarch64
+Requires: kernel-uek-container >= 5.15.0
+%endif
+%endif
+
 Requires: kernel-uek >= 5.15.0
 
 %ifarch aarch64
