@@ -94,15 +94,13 @@ Requires: cri-o >= 1.23
 Requires: cri-tools >= 1.23
 
 %if %{?oraclelinux} == 8
-Requires: kernel-uek-container >= 5.15.0
+Requires: kernel-uek >= 5.4.17
+Requires: kernel-uek-container >= 5.4.17
 %endif
 %if %{?oraclelinux} == 9
-%ifnarch aarch64
+Requires: kernel-uek >= 5.15.0
 Requires: kernel-uek-container >= 5.15.0
 %endif
-%endif
-
-Requires: kernel-uek >= 5.15.0
 
 %ifarch aarch64
 BuildRequires: glibc
@@ -257,7 +255,7 @@ checkCrioConf () {
 }
 
 checkCrioConf "\[crio.runtime\]" "manage_network_ns_lifecycle" "true"
-checkCrioConf "\[crio.runtime\]" "selinux" "false"
+checkCrioConf "\[crio.runtime\]" "selinux" "true"
 checkCrioConf "\[crio.image\]" "registries" "\[\"docker.io\", \"container-registry.oracle.com\/olcne\"\]"
 checkCrioConf "\[crio.image\]" "pause_image_auth_file" "\"\/run\/containers\/0\/auth.json\""
 checkCrioConf "\[crio.image\]" "pause_image " "\"container-registry.oracle.com\/olcne\/pause:3.9\""
