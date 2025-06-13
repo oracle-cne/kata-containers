@@ -75,32 +75,41 @@ BuildRequires: systemd
 BuildRequires: libselinux-devel
 BuildRequires: libseccomp-devel
 
+%define is_uek_kernel %(uname -a | awk '{print $3}' | grep -q uek && echo 0 || echo 1)
+
 %if %{?oraclelinux} == 8
 # rust and cargo versions in versions.yaml of kata-containers repo
-BuildRequires: rust-toolset >= 1.69.0
+{{{- if semverCompare ">3.3.0" $version }}}
+BuildRequires: rust-toolset >= 1.72.0
+{{{- else }}}
+BuildRequires: (rust-toolset >= 1.69.0 with rust-toolset < 1.72.0)
+{{{- end }}}
 # Refer qemu version in versions.yaml of kata-containers repo
 Requires: qemu-kvm-core >= 7.2.0
+%if %{is_uek_kernel} == 0
+Requires: kernel-uek >= 5.4.17
+Requires: kernel-uek-container >= 5.4.17
+%endif
 %endif
 
 %if %{?oraclelinux} == 9
 # Refer rust and cargo versions in versions.yaml of kata-containers repo
-BuildRequires: rust-toolset >= 1.69.0
+{{{- if semverCompare ">3.3.0" $version }}}
+BuildRequires: rust-toolset >= 1.72.0
+{{{- else }}}
+BuildRequires: (rust-toolset >= 1.69.0 with rust-toolset < 1.72.0)
+{{{- end }}}
 # Refer qemu version in versions.yaml of kata-containers repo
 Requires: qemu-kvm-core >= 7.2.0
+%if %{is_uek_kernel} == 0
+Requires: kernel-uek >= 5.15.0
+Requires: kernel-uek-container >= 5.15.0
+%endif
 %endif
 
 # Refer cri-o and cri-tools versions in versions.yaml of kata-containers repo
 Requires: cri-o >= 1.23
 Requires: cri-tools >= 1.23
-
-%if %{?oraclelinux} == 8
-Requires: kernel-uek >= 5.4.17
-Requires: kernel-uek-container >= 5.4.17
-%endif
-%if %{?oraclelinux} == 9
-Requires: kernel-uek >= 5.15.0
-Requires: kernel-uek-container >= 5.15.0
-%endif
 
 %ifarch aarch64
 BuildRequires: glibc
