@@ -115,7 +115,7 @@ BuildRequires: iptables-legacy
 
 # Refer virtiofsd version in versions.yaml of kata-containers repo
 # For /usr/libexec/virtiofsd
-Requires: virtiofsd >= 1.8.0
+Requires: virtiofsd >= 1.13.1
 Suggests: virtiofsd
 
 Obsoletes: kata <= %{version}
