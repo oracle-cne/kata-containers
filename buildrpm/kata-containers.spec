@@ -51,6 +51,7 @@
 %global _buildhost build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 
 %global golang_version %(echo $(grep ^go src/runtime/go.mod | cut -d" " -f2))
+%global virtiofsd_version %(echo $(source tools/packaging/scripts/lib.sh && echo "$(get_from_kata_deps ".externals.virtiofsd.version")" | cut -d"v" -f2))
 
 Name:	      %{repo}
 Version:      3.20.0
@@ -68,6 +69,7 @@ Patch2:       tools-osbuilder-lib.patch
 # golang version in versions.yaml of kata-containers repo
 BuildRequires: golang >= %{golang_version}
 BuildRequires: qemu-img
+BuildRequires: yq
 BuildRequires: parted
 BuildRequires: e2fsprogs
 BuildRequires: util-linux
@@ -117,7 +119,7 @@ BuildRequires: iptables-legacy
 
 # Refer virtiofsd version in versions.yaml of kata-containers repo
 # For /usr/libexec/virtiofsd
-Requires: virtiofsd >= 1.13.1
+Requires: virtiofsd >= %{virtiofsd_version}
 Suggests: virtiofsd
 
 Obsoletes: kata <= %{version}
