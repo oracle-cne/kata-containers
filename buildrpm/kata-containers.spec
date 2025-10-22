@@ -50,6 +50,8 @@
 
 %global _buildhost build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 
+%global golang_version %(echo $(grep ^go src/runtime/go.mod | cut -d" " -f2))
+
 Name:	      %{repo}
 Version:      3.20.0
 Release:      1%{?dist}
@@ -64,7 +66,7 @@ Patch1:       image_builder.sh.patch
 Patch2:       tools-osbuilder-lib.patch
 
 # golang version in versions.yaml of kata-containers repo
-BuildRequires: golang >= 1.19.3
+BuildRequires: golang >= %{golang_version}
 BuildRequires: qemu-img
 BuildRequires: parted
 BuildRequires: e2fsprogs
