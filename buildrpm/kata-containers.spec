@@ -96,7 +96,7 @@ Requires: kernel-uek-container >= 5.4.17
 # Refer rust and cargo versions in versions.yaml of kata-containers repo
 BuildRequires: rust-toolset >= 1.72.0
 # Refer qemu version in versions.yaml of kata-containers repo
-Requires: qemu-kvm-core >= 7.2.0
+Requires: qemu-kvm-core >= 9.1.0
 %if %{is_uek_kernel} == 0
 Requires: kernel-uek >= 5.15.0
 Requires: kernel-uek-container >= 5.15.0
