@@ -259,7 +259,7 @@ checkCrioConf "\[crio.runtime\]" "manage_network_ns_lifecycle" "true"
 checkCrioConf "\[crio.runtime\]" "selinux" "true"
 checkCrioConf "\[crio.image\]" "registries" "\[\"docker.io\", \"container-registry.oracle.com\/olcne\"\]"
 checkCrioConf "\[crio.image\]" "pause_image_auth_file" "\"\/run\/containers\/0\/auth.json\""
-checkCrioConf "\[crio.image\]" "pause_image " "\"container-registry.oracle.com\/olcne\/pause:3.9\""
+checkCrioConf "\[crio.image\]" "pause_image " "\"container-registry.oracle.com\/olcne\/pause:3.10\""
 
 # insert extra config section if it's missing
 if ! grep -q "\[crio.runtime.runtimes.kata\]" %{_sysconfdir}/crio/crio.conf; then
