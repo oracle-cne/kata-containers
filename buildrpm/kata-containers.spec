@@ -273,7 +273,7 @@ privileged_without_host_devices = true\n'\
       %{_sysconfdir}/crio/crio.conf
 else
 checkCrioConf "\[crio.runtime.runtimes.kata\]" "runtime_path" "\"\/usr\/bin\/containerd-shim-kata-v2\""
-checkCrioConf "\[crio.runtime.runtimes.kata\]" "runtime_type" "vm"
+checkCrioConf "\[crio.runtime.runtimes.kata\]" "runtime_type" "\"vm\""
 checkCrioConf "\[crio.runtime.runtimes.kata\]" "runtime_root" "\"\/run\/vc\""
 checkCrioConf "\[crio.runtime.runtimes.kata\]" "privileged_without_host_devices" true
 fi
