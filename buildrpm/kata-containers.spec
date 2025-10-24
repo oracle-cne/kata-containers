@@ -294,6 +294,10 @@ sed -i -e 's/^#use_vsock =/use_vsock =/' $QEMU_CONF
 sudo sed -i 's!path =.*!path = "/usr/libexec/qemu-kvm"!g' $QEMU_CONF
 %endif
 
+# Enable debug https://github.com/kata-containers/kata-containers/blob/3.20.0/docs/Developer-Guide.md#enable-full-debug
+sudo sed -i -e 's/^# *\(enable_debug\).*=.*$/\1 = true/g' /usr/share/defaults/kata-containers/configuration.toml
+sudo sed -i -e 's/^kernel_params = "\(.*\)"/kernel_params = "\1 agent.log=debug initcall_debug"/g' /usr/share/defaults/kata-containers/configuration.toml
+
 %changelog
 * Thu Oct 16 2025 Oracle Cloud Native Environment Authors <noreply@oracle.com> - 3.20.0-1
 - Added Oracle Specific Build Files for kata-containers
