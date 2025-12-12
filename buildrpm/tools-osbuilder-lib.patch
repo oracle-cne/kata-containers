@@ -1,0 +1,32 @@
+diff --git tools/osbuilder/scripts/lib.sh tools/osbuilder/scripts/lib.sh
+index 615ff10a9..fd292ab4f 100644
+--- tools/osbuilder/scripts/lib.sh
++++ tools/osbuilder/scripts/lib.sh
+@@ -85,7 +85,7 @@ EOF
+ name=${OS_NAME}-${OS_VERSION} upstream
+ releasever=${OS_VERSION}
+ EOF
+-		echo "metalink=$METALINK_APPSTREAM" >> "$DNF_CONF"
++		echo "baseurl=$APPSTREAM_URL" >> "$DNF_CONF"
+ 		if [ -n "$GPG_KEY_URL" ]; then
+ 			if [ ! -f "${CONFIG_DIR}/${GPG_KEY_FILE}" ]; then
+ 				curl -L "${GPG_KEY_URL}" -o "${CONFIG_DIR}/${GPG_KEY_FILE}"
+diff --git tools/osbuilder/initrd-builder/initrd_builder.sh tools/osbuilder/initrd-builder/initrd_builder.sh
+index f3c1c2883..765f9c536 100755
+--- tools/osbuilder/initrd-builder/initrd_builder.sh
++++ tools/osbuilder/initrd-builder/initrd_builder.sh
+@@ -79,11 +79,11 @@ if [ ! -x "${ROOTFS}/init" ] && [ ! -L "${ROOTFS}/init" ]; then
+   # i.e. (/init to /sbin/init to /lib/systemd/systemd)
+   # Setting /init directly to /lib/systemd/systemd when AGENT_INIT is disabled
+   if [ "${AGENT_INIT}" = "yes" ]; then
+-    sudo ln -sf /sbin/init "${ROOTFS}/init"
++    ln -sf /sbin/init "${ROOTFS}/init"
+   else
+-    sudo ln -sf /lib/systemd/systemd "${ROOTFS}/init"
++    ln -sf /lib/systemd/systemd "${ROOTFS}/init"
+   fi
+ fi
+ 
+ info "Creating ${IMAGE_DIR}/${IMAGE_NAME} based on rootfs at ${ROOTFS}"
+-( cd "${ROOTFS}" && sudo find . | sudo cpio -H newc -o | gzip -9 ) > "${IMAGE_DIR}"/"${IMAGE_NAME}"
++( cd "${ROOTFS}" && find . | cpio -H newc -o | gzip -9 ) > "${IMAGE_DIR}"/"${IMAGE_NAME}"
