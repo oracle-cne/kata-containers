@@ -3,6 +3,9 @@ OS_VERSION=8
 
 LOG_FILE="/var/log/yum-ol8.log"
 
+# OL8 systemd scriptlets fail under --installroot, so skip them for the guest rootfs build.
+PKG_MANAGER="${PKG_MANAGER:-yum} --setopt=tsflags=noscripts"
+
 BASE_URL="http://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/\$basearch"
 
 GPG_KEY_FILE="RPM-GPG-KEY-oracle-ol8"
