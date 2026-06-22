@@ -1,0 +1,13 @@
+#! /bin/bash
+
+while getopts "s:" o; do
+	case "${o}" in
+		s)
+			device=${OPTARG}
+			;;
+		*)
+			echo "$0 -s device" 1>&2; exit 2;
+	esac
+done
+
+lsblk --raw --output NAME,MAJ:MIN --noheadings $device | perl -n -e'/([a-z0-9]+) ([0-9]+):([0-9]+)/ && system("mknod", "/dev/$1", "-m0660", "b", $2, $3)'
