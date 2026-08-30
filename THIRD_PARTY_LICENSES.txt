@@ -8125,17 +8125,6 @@ Copyright (c) 2017 Artyom Pavlov
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
-dispatch2@0.3.1
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-(no copyright notices found)
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
 displaydoc@0.2.5
 
 == License Type
@@ -11095,54 +11084,10 @@ SPDX:Apache-2.0
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
-objc2-encode@4.1.0
-
-== License Type
-SPDX:MIT
-
-== Copyright
-(no copyright notices found)
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-objc2-foundation@0.3.2
-
-== License Type
-SPDX:MIT
-
-== Copyright
-(no copyright notices found)
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
 objc2-io-kit@0.3.2
 
 == License Type
 SPDX:Apache-2.0
-
-== Copyright
-(no copyright notices found)
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-objc2-open-directory@0.3.2
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-(no copyright notices found)
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-objc2@0.6.4
-
-== License Type
-SPDX:MIT
 
 == Copyright
 (no copyright notices found)
@@ -14837,7 +14782,7 @@ Copyright (c) 2017 Johannes Lundberg
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
-sysinfo@0.39.6
+sysinfo@0.38.4
 
 == License Type
 SPDX:MIT
