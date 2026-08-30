@@ -54,7 +54,7 @@ Name:	      %{repo}
 Version:      4.1.0
 Release:      1%{?dist}
 Vendor:	      Oracle America
-Summary:      Kata Containers version 2.x repository
+Summary:      Kata Containers 4.1.0 runtime, guest agent, and rootfs image
 Url:	      https://%{download}
 Group:        Development/Tools
 License:      Apache-2.0
@@ -63,8 +63,8 @@ Patch0:	      Makefile.patch
 Patch1:       image_builder.sh.patch
 Patch2:       tools-osbuilder-lib.patch
 
-# golang version in versions.yaml of kata-containers repo
-BuildRequires: golang >= 1.19.3
+# Keep this in sync with versions.yaml and the repository go.mod files.
+BuildRequires: golang >= 1.25.13
 BuildRequires: qemu-img
 BuildRequires: parted
 BuildRequires: e2fsprogs
@@ -78,10 +78,10 @@ BuildRequires: libseccomp-devel
 %define is_uek_kernel %(uname -a | awk '{print $3}' | grep -q uek && echo 0 || echo 1)
 
 %if %{?oraclelinux} == 8
-# rust and cargo versions in versions.yaml of kata-containers repo
-BuildRequires: rust-toolset >= 1.72.0
-# Refer qemu version in versions.yaml of kata-containers repo
-Requires: qemu-kvm-core >= 7.2.0
+# Keep this in sync with versions.yaml and Cargo.toml.
+BuildRequires: rust-toolset >= 1.92
+# Use the QEMU package supplied by the target OL repository.
+Requires: qemu-kvm-core
 %if %{is_uek_kernel} == 0
 Requires: kernel-uek >= 5.4.17
 Requires: kernel-uek-container >= 5.4.17
@@ -89,10 +89,10 @@ Requires: kernel-uek-container >= 5.4.17
 %endif
 
 %if %{?oraclelinux} == 9
-# Refer rust and cargo versions in versions.yaml of kata-containers repo
-BuildRequires: rust-toolset >= 1.72.0
-# Refer qemu version in versions.yaml of kata-containers repo
-Requires: qemu-kvm-core >= 7.2.0
+# Keep this in sync with versions.yaml and Cargo.toml.
+BuildRequires: rust-toolset >= 1.92
+# Use the QEMU package supplied by the target OL repository.
+Requires: qemu-kvm-core
 %if %{is_uek_kernel} == 0
 Requires: kernel-uek >= 5.15.0
 Requires: kernel-uek-container >= 5.15.0
@@ -113,9 +113,9 @@ BuildRequires: iptables-legacy
 %endif
 %endif
 
-# Refer virtiofsd version in versions.yaml of kata-containers repo
-# For /usr/libexec/virtiofsd
-Requires: virtiofsd >= 1.8.0
+# Refer to the virtiofsd version in versions.yaml of kata-containers repo.
+# For /usr/libexec/virtiofsd; use the target OL repository version.
+Requires: virtiofsd
 Suggests: virtiofsd
 
 Obsoletes: kata <= %{version}
@@ -127,7 +127,7 @@ Obsoletes: kata-shim <= %{version}
 Obsoletes: kata-agent <= %{version}
 
 %description
-Kata Containers version 2.x repository. Kata Containers is an open source
+Kata Containers 4.1.0. Kata Containers is an open source
 project and community working to build a standard implementation of lightweight
 Virtual Machines (VMs) that feel and perform like containers, but provide the
 workload isolation and security advantages of VMs. https://katacontainers.io/.}
@@ -141,8 +141,17 @@ workload isolation and security advantages of VMs. https://katacontainers.io/.}
 %build
 export GOPATH=$(go env GOPATH)
 GOPATH_SRC=$GOPATH/src/%{importname}
-%__mkdir_p $GOPATH_SRC
+%__mkdir_p $(dirname $GOPATH_SRC)
+rm -rf $GOPATH_SRC
 %__ln_s %{_builddir}/%{name}-%{version} $GOPATH_SRC
+
+# The 4.1.0 component Makefiles are invoked from their own directories but
+# consume VERSION relative to the current directory.  Stage the canonical
+# repository version file for those component builds.
+echo "RPM build: staging VERSION for runtime, guest agent, and osbuilder"
+install -m 0644 VERSION src/runtime/VERSION
+install -m 0644 VERSION src/agent/VERSION
+install -m 0644 VERSION tools/osbuilder/VERSION
 
 #runtime
 pushd src/runtime
@@ -151,8 +160,8 @@ popd
 
 #agent
 pushd src/agent
+echo "RPM build: building the 4.1.0 guest agent"
 %make_build %{agent_make_vars}
-touch kata-agent
 popd
 
 pushd src/tools/log-parser
@@ -172,6 +181,7 @@ cp buildrpm/oracle/build_kata_image tools/osbuilder
 chmod 755 tools/osbuilder/build_kata_image
 
 pushd tools/osbuilder
+echo "RPM build: building the 4.1.0 guest initrd and rootfs image"
 sh build_kata_image %{oraclelinux}
 popd
 
@@ -237,6 +247,10 @@ popd
 %{_bindir}/kata-agent
 /usr/lib/systemd/system/kata-agent.service
 /usr/lib/systemd/system/kata-containers.target
+/usr/lib/systemd/system/kata-extension-mount@.service
+/usr/lib/systemd/system-generators/kata-extension-mount-generator
+/usr/libexec/kata-extension-mount.sh
+/usr/libexec/kata-extension-umount.sh
 
 %post
 # we need to make some baseline adjustments to the crio config post installation
@@ -280,14 +294,14 @@ fi
 
 # Configure configuration-qemu.toml
 QEMU_CONF="/usr/share/defaults/kata-containers/configuration-qemu.toml"
-sudo sed -i '/image =/d' $QEMU_CONF
-sudo sed -i '/hypervisor.qemu/a initrd = "/usr/share/kata-containers/kata-containers-initrd.img"' $QEMU_CONF
-sudo sed -i 's!kernel =.*!kernel = "/usr/share/kata-containers/vmlinuz.container"!g' $QEMU_CONF
-sudo sed -i 's/shared_fs =.*/shared_fs = "virtio-fs"/g' $QEMU_CONF
+sed -i '/image =/d' $QEMU_CONF
+sed -i '/hypervisor.qemu/a initrd = "/usr/share/kata-containers/kata-containers-initrd.img"' $QEMU_CONF
+sed -i 's!kernel =.*!kernel = "/usr/share/kata-containers/vmlinuz.container"!g' $QEMU_CONF
+sed -i 's/shared_fs =.*/shared_fs = "virtio-fs"/g' $QEMU_CONF
 # Enable vsock as transport instead of virtio-serial
 sed -i -e 's/^#use_vsock =/use_vsock =/' $QEMU_CONF
 %if %{?oraclelinux} == 8 || %{?oraclelinux} == 9
-sudo sed -i 's!path =.*!path = "/usr/libexec/qemu-kvm"!g' $QEMU_CONF
+sed -i 's!path =.*!path = "/usr/libexec/qemu-kvm"!g' $QEMU_CONF
 %endif
 
 %changelog

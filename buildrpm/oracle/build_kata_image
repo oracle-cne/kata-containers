@@ -1,4 +1,4 @@
-echo "Running: build_kata_image as $(whoami)"
+echo "RPM rootfs build: starting build_kata_image as $(whoami)"
 # Script responsible for oclc-image
 export DISTRO=ol${1}
 
@@ -11,7 +11,9 @@ function cleanup {
 
 set -x
 
-hered=$(cd $(dirname $0) && pwd )
+script_dir=$(cd "$(dirname "$0")" && pwd)
+repo_root=$(cd "${script_dir}/../.." && pwd)
+echo "RPM rootfs build: script_dir=${script_dir} repo_root=${repo_root} distro=${DISTRO}"
 
 # Make some loopback devices if none are present
 ls /dev/loop[0-9] 1>/dev/null 2>/dev/null
@@ -33,7 +35,20 @@ cp ./partprobe `which partprobe`
 # To support OL8 builds, we need to identify the platform of the build environment
 ROOTFS_DIR=`pwd`/${DISTRO}_rootfs
 
-export AGENT_SOURCE_BIN=../../src/agent/target/$(uname --hardware-platform)-unknown-linux-gnu/release/kata-agent
+export AGENT_SOURCE_BIN="${repo_root}/target/$(uname --hardware-platform)-unknown-linux-gnu/release/kata-agent"
+export AGENT_SOURCE_DIR="${repo_root}/src/agent"
+echo "RPM rootfs build: agent binary=${AGENT_SOURCE_BIN} agent units=${AGENT_SOURCE_DIR}"
+test -x "${AGENT_SOURCE_BIN}"
+test -f "${AGENT_SOURCE_DIR}/kata-agent.service"
+test -f "${AGENT_SOURCE_DIR}/kata-containers.target"
+
+# The RPM build already runs in a privileged build environment.  osbuilder
+# treats any non-empty USE_DOCKER value, including "false", as a request for
+# a nested container build.  Keep it empty so that the OL rootfs is assembled
+# directly and the build does not require an inner container daemon.
+export USE_DOCKER=
+export USE_PODMAN=
+echo "RPM rootfs build: using direct osbuilder execution (no nested container engine)"
 
 # ==== First the initrd
 export AGENT_INIT=yes

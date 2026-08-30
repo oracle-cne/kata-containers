@@ -1,0 +1,133 @@
+#!/usr/bin/expect -f
+# SPDX-License-Identifier: Apache-2.0
+#
+# Drive the rootful OL8 Kata RPM build from one local command.  Every Podman
+# operation is spawned through sudo -n: there is no password prompt to answer
+# and all status polling stays inside this Expect process.
+
+set timeout -1
+
+proc log {message} {
+    puts "[clock format [clock seconds] -format {%Y-%m-%dT%H:%M:%SZ} -gmt true] buildrpm4/ol8: $message"
+}
+
+proc fail {message} {
+    log "ERROR: $message"
+    exit 1
+}
+
+proc run {description args} {
+    log "START: $description"
+    spawn -noecho {*}$args
+    expect eof
+    set result [wait]
+    set exit_code [lindex $result 3]
+    if {$exit_code != 0} {
+        fail "$description failed with exit status $exit_code"
+    }
+    log "DONE: $description"
+}
+
+proc capture {description args} {
+    log "START: $description"
+    set output [exec {*}$args]
+    log "DONE: $description"
+    return $output
+}
+
+proc podman {description args} {
+    run $description sudo -n podman {*}$args
+}
+
+proc podman_capture {description args} {
+    return [capture $description sudo -n podman {*}$args]
+}
+
+proc assert_container_running {container} {
+    set state [string trim [podman_capture "checking container state" inspect --format {{.State.Running}} $container]]
+    if {$state ne "true"} {
+        fail "container '$container' is not running"
+    }
+}
+
+proc status {container} {
+    assert_container_running $container
+    podman "checking build processes" exec $container bash -lc {pgrep -af 'rpmbuild|cargo|make image|make initrd|dnf|mkfs|qemu-img' || true}
+    podman "showing recent build log" exec $container bash -lc {tail -n 100 /work/rpmbuild-rust192-rootful.log}
+}
+
+proc follow {container interval} {
+    log "Following '$container' every $interval seconds; press Ctrl-C to stop following."
+    while {1} {
+        status $container
+        after [expr {$interval * 1000}]
+    }
+}
+
+proc verify {} {
+    if {[info exists ::env(KATA_RPM_OUTPUT_DIR)]} {
+        set output_dir $::env(KATA_RPM_OUTPUT_DIR)
+    } else {
+        set output_dir /tmp/kata-rpm-ol8-rootful.LmsCev
+    }
+
+    set rpm_path [file join $output_dir rpmbuild RPMS x86_64 kata-containers-4.1.0-1.el8.x86_64.rpm]
+    if {![file isfile $rpm_path]} {
+        fail "RPM not found at '$rpm_path'; set KATA_RPM_OUTPUT_DIR to the mounted build-output directory"
+    }
+
+    run "verifying RPM integrity" rpm -Kv $rpm_path
+    set payload [capture "reading RPM payload" rpm -qlp $rpm_path]
+    foreach required_file {
+        /usr/share/kata-containers/kata-containers-4.1.0.img
+        /usr/share/kata-containers/kata-containers-initrd-4.1.0.img
+        /usr/share/kata-containers/kata-containers.img
+        /usr/share/kata-containers/kata-containers-initrd.img
+    } {
+        if {[string first $required_file $payload] < 0} {
+            fail "required image payload entry is absent: $required_file"
+        }
+        log "VERIFIED: $required_file"
+    }
+    log "VERIFIED RPM: $rpm_path"
+}
+
+proc usage {} {
+    puts stderr "usage: build-ol8-privileged.expect {status ?container?|follow ?seconds? ?container?|verify}"
+    puts stderr "default container: kata-rpm-ol8-rootful-build"
+    exit 2
+}
+
+if {$argc < 1 || $argc > 3} {
+    usage
+}
+
+set action [lindex $argv 0]
+set container kata-rpm-ol8-rootful-build
+if {$argc == 3} {
+    set container [lindex $argv 2]
+}
+
+switch -- $action {
+    status {
+        if {$argc > 2} { usage }
+        if {$argc == 2} { set container [lindex $argv 1] }
+        status $container
+    }
+    follow {
+        set interval 30
+        if {$argc >= 2} { set interval [lindex $argv 1] }
+        if {![string is integer -strict $interval] || $interval < 1} {
+            fail "follow interval must be a positive integer"
+        }
+        if {$argc == 3} { set container [lindex $argv 2] }
+        follow $container $interval
+    }
+    verify {
+        if {$argc != 1} { usage }
+        verify
+    }
+    default {
+        usage
+    }
+}
