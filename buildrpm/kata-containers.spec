@@ -64,7 +64,6 @@ Patch1:       image_builder.sh.patch
 Patch2:       tools-osbuilder-lib.patch
 
 # Keep this in sync with versions.yaml and the repository go.mod files.
-BuildRequires: golang >= 1.25.13
 BuildRequires: qemu-img
 BuildRequires: parted
 BuildRequires: e2fsprogs
