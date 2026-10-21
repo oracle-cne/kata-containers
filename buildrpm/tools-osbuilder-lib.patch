@@ -1,0 +1,13 @@
+diff --git tools/osbuilder/scripts/lib.sh tools/osbuilder/scripts/lib.sh
+index 615ff10a9..fd292ab4f 100644
+--- tools/osbuilder/scripts/lib.sh
++++ tools/osbuilder/scripts/lib.sh
+@@ -85,7 +85,7 @@ EOF
+ name=${OS_NAME}-${OS_VERSION} upstream
+ releasever=${OS_VERSION}
+ EOF
+-		echo "metalink=$METALINK_APPSTREAM" >> "$DNF_CONF"
++		echo "baseurl=$APPSTREAM_URL" >> "$DNF_CONF"
+ 		if [ -n "$GPG_KEY_URL" ]; then
+ 			if [ ! -f "${CONFIG_DIR}/${GPG_KEY_FILE}" ]; then
+ 				curl -L "${GPG_KEY_URL}" -o "${CONFIG_DIR}/${GPG_KEY_FILE}"
