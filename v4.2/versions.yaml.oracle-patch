@@ -1,0 +1,19 @@
+diff --git a/versions.yaml b/versions.yaml
+index dc069b598e7d8d06b0b9ec646238af1e05a0e5a3..7d5210963844473fbbd1b70561efc2c304bfec96 100644
+--- a/versions.yaml
++++ b/versions.yaml
+@@ -441,12 +441,12 @@ languages:
+     description: "Rust language"
+     notes: "'version' is the default minimum version used by this project."
+     # Keep in sync with rust-toolchain.toml
+-    version: "1.96"
++    version: "1.92"
+     meta:
+       description: |
+         'newest-version' is the latest version known to work when
+         building Kata
+-      newest-version: "1.96"
++      newest-version: "1.92"
+ 
+   golangci-lint:
+     description: "golangci-lint"
